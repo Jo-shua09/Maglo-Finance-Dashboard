@@ -1,2 +1,0 @@
-- [x] Add import for MoreHorizontal from lucide-react in src/pages/Invoices.tsx
-- [x] Replace the TableCell div with DropdownMenu structure: Trigger with Button containing MoreHorizontal icon, Content with conditional 'Mark as Paid' and 'Delete' MenuItems
