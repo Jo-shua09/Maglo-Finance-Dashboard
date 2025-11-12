@@ -50,16 +50,16 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex h-screen overflow-x-hidden">
-      <div className="flex w-full flex-col justify-between">
-        <div className="mx-auto w-full max-w-md space-y-14 py-8">
-          <div>
+    <div className="flex h-screen">
+      <div className="flex w-full flex-col justify-center">
+        <div className="mx-auto w-full max-w-md px-4 py-8">
+          <div className="mb-8">
             <img src={logo} alt="Maglo Logo" className="h-8 w-auto" />
           </div>
 
-          <div className="mx-auto w-full max-w-md">
-            <h1 className="mb-1 text-4xl font-bold">Create new account</h1>
-            <p className="mb-8 text-muted-foreground">Welcome! Please enter your details to get started</p>
+          <div className="w-full">
+            <h1 className="mb-1 text-3xl sm:text-4xl font-bold">Create new account</h1>
+            <p className="mb-6 sm:mb-8 text-muted-foreground">Welcome! Please enter your details to get started</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
