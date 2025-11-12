@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -15,13 +15,14 @@ import {
   SidebarProvider,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { Settings, HelpCircle, LogOut, Search, Bell } from "lucide-react";
+import { Settings, HelpCircle, LogOut, Search, Bell, PanelRight } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import logo from "@/assets/logo.png";
 import { RiArrowDownSFill } from "react-icons/ri";
 import { GoHomeFill } from "react-icons/go";
 import { FaArrowTrendUp, FaWallet } from "react-icons/fa6";
 import { TbInvoice } from "react-icons/tb";
+import { BsLayoutSidebarReverse } from "react-icons/bs";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -38,6 +39,7 @@ const navigationItems = [
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { signOut, user } = useAuth();
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -53,62 +55,83 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <Sidebar className="px-1">
-          <div className="px-4 py-6">
-            <img src={logo} alt="Maglo" className="h-8 w-auto" />
-          </div>
+        {sidebarOpen && (
+          <Sidebar className="px-1">
+            <div className="px-4 py-6">
+              <img src={logo} alt="Maglo" className="h-8 w-auto" />
+            </div>
 
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {navigationItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <NavLink
-                          to={item.url}
-                          className="flex items-center gap-3 px-4 py-5 text-muted-foreground hover:text-foreground transition-colors"
-                          activeClassName="bg-primary text-primary-foreground rounded-lg font-medium"
-                        >
-                          <item.icon className="h-5 w-5" />
-                          <span>{item.title}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {navigationItems.map((item) => (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton asChild>
+                          <NavLink
+                            to={item.url}
+                            className="flex items-center gap-3 px-4 py-5 text-muted-foreground hover:text-foreground transition-colors"
+                            activeClassName="bg-primary text-primary-foreground rounded-lg font-medium"
+                          >
+                            <item.icon className="h-5 w-5" />
+                            <span>{item.title}</span>
+                          </NavLink>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
 
-          <SidebarFooter className="p-4 space-y-2">
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <button className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground transition-colors w-full">
-                    <HelpCircle className="h-5 w-5" />
-                    <span>Help</span>
-                  </button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <button
-                    onClick={() => signOut()}
-                    className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground transition-colors w-full"
-                  >
-                    <LogOut className="h-5 w-5" />
-                    <span>Logout</span>
-                  </button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
-        </Sidebar>
+            <SidebarFooter className="p-4 space-y-2">
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <button className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground transition-colors w-full">
+                      <HelpCircle className="h-5 w-5" />
+                      <span>Help</span>
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <button
+                      onClick={() => signOut()}
+                      className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground transition-colors w-full"
+                    >
+                      <LogOut className="h-5 w-5" />
+                      <span>Logout</span>
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarFooter>
+          </Sidebar>
+        )}
 
         <div className="flex-1 flex flex-col">
           <header className="h-16 bg-card flex items-center justify-between px-6">
-            <h1 className="text-xl font-semibold">{getPageTitle()}</h1>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:bg-transparent transition-all duration-200"
+                aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+                onClick={() => setSidebarOpen((open) => !open)}
+              >
+                {sidebarOpen ? (
+                  <div className="p-2 bg-primary rounded-xl transition-all duration-200">
+                    <PanelRight size={20} className="h-5 w-5" />
+                  </div>
+                ) : (
+                  <div className="p-2 hover:bg-primary transition-all duration-200 rounded-xl">
+                    <PanelRight size={20} className="h-5 w-5" />
+                  </div>
+                )}
+              </Button>
+              <h1 className="text-xl font-semibold">{getPageTitle()}</h1>
+            </div>
 
             <div className="flex items-center gap-4">
               <div>
@@ -127,7 +150,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       <AvatarImage src="" />
                       <AvatarFallback className="bg-gray-300 text-primary-foreground">{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium">{user?.email?.split("@")[0]}</span>
+                    <span className="text-sm lg:block hidden font-medium">{user?.email?.split("@")[0]}</span>
                     <RiArrowDownSFill className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>

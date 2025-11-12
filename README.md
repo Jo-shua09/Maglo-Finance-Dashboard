@@ -95,7 +95,6 @@ src/
 This project can be deployed to various platforms:
 
 - **Vercel/Netlify**: Connect your repository and deploy automatically
-- **Custom Domain**: Configure in Lovable settings or your hosting platform
 
 ## Contributing
 
