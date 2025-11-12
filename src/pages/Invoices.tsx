@@ -8,6 +8,7 @@ import { Filter, Plus, Search, MoreHorizontal } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { CreateInvoiceDialog } from "@/components/CreateInvoiceDialog";
+import { EditInvoiceDialog } from "@/components/EditInvoiceDialog";
 import { formatDistanceToNow } from "date-fns";
 import { databases, databaseId, collectionId, ID } from "@/integrations/appwrite/client";
 import { Query, Models } from "appwrite";
@@ -16,6 +17,8 @@ import { FaFileInvoice, FaFilter } from "react-icons/fa6";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IoFilterSharp } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Invoice {
   id: string;
@@ -32,10 +35,13 @@ interface Invoice {
 
 export default function Invoices() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "paid" | "unpaid">("all");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   useEffect(() => {
     fetchInvoices();
@@ -67,7 +73,7 @@ export default function Invoices() {
       // Fallback to mock data if database fails
       const mockInvoices: Invoice[] = [
         {
-          id: "1",
+          id: "mock-1",
           client_name: "John Doe",
           client_email: "john@example.com",
           amount: 1000,
@@ -79,13 +85,13 @@ export default function Invoices() {
           created_at: new Date().toISOString(),
         },
         {
-          id: "1",
-          client_name: "John Doe",
-          client_email: "john@example.com",
-          amount: 1000,
+          id: "mock-2",
+          client_name: "Jane Smith",
+          client_email: "jane@example.com",
+          amount: 1500,
           vat_percentage: 7.5,
-          vat_amount: 75,
-          total_amount: 1075,
+          vat_amount: 112.5,
+          total_amount: 1612.5,
           due_date: "2024-12-31",
           status: "paid",
           created_at: new Date().toISOString(),
@@ -156,10 +162,16 @@ export default function Invoices() {
               Create Invoice
             </Button>
 
-            <Button variant="outline" className="font-semibold text-primary-foreground">
-              <IoFilterSharp className="h-4 w-4" />
-              Filters
-            </Button>
+            <Select value={filter} onValueChange={(value: "all" | "paid" | "unpaid") => setFilter(value)}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="unpaid">Unpaid</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -184,7 +196,7 @@ export default function Invoices() {
               </TableRow>
             ) : (
               filteredInvoices.map((invoice) => (
-                <TableRow key={invoice.id}>
+                <TableRow key={invoice.id} className="cursor-pointer hover:bg-gray-50" onClick={() => navigate(`/invoices/${invoice.id}`)}>
                   <TableCell>
                     <div className="flex space-x-3 items-center">
                       <Avatar className="h-8 w-8">
@@ -233,7 +245,7 @@ export default function Invoices() {
                       {invoice.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -243,6 +255,14 @@ export default function Invoices() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {invoice.status === "unpaid" && <DropdownMenuItem onClick={() => markAsPaid(invoice.id)}>Mark as Paid</DropdownMenuItem>}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedInvoice(invoice);
+                            setEditDialogOpen(true);
+                          }}
+                        >
+                          Edit
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => deleteInvoice(invoice.id)} className="text-destructive">
                           Delete
                         </DropdownMenuItem>
@@ -256,6 +276,7 @@ export default function Invoices() {
         </Table>
 
         <CreateInvoiceDialog open={dialogOpen} onOpenChange={setDialogOpen} onSuccess={fetchInvoices} />
+        <EditInvoiceDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} invoice={selectedInvoice} onSuccess={fetchInvoices} />
       </div>
     </DashboardLayout>
   );

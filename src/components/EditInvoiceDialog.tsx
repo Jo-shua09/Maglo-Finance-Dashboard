@@ -1,32 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { databases, databaseId, collectionId, ID } from "@/integrations/appwrite/client";
+import { databases, databaseId, collectionId } from "@/integrations/appwrite/client";
 
-interface CreateInvoiceDialogProps {
+interface Invoice {
+  id: string;
+  client_name: string;
+  client_email: string;
+  amount: number;
+  vat_percentage: number;
+  vat_amount: number;
+  total_amount: number;
+  due_date: string;
+  status: string;
+  created_at: string;
+  items?: { name: string; quantity: number; rate: number; amount: number }[];
+}
+
+interface EditInvoiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  invoice: Invoice | null;
   onSuccess: () => void;
 }
 
-export function CreateInvoiceDialog({ open, onOpenChange, onSuccess }: CreateInvoiceDialogProps) {
-  const { user } = useAuth();
+export function EditInvoiceDialog({ open, onOpenChange, invoice, onSuccess }: EditInvoiceDialogProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     clientName: "",
     clientEmail: "",
     amount: "",
-    vatPercentage: "7.5",
+    vatPercentage: "",
     dueDate: "",
   });
 
+  useEffect(() => {
+    if (invoice) {
+      setFormData({
+        clientName: invoice.client_name,
+        clientEmail: invoice.client_email,
+        amount: invoice.amount.toString(),
+        vatPercentage: invoice.vat_percentage.toString(),
+        dueDate: invoice.due_date.split("T")[0], // Format for date input
+      });
+    }
+  }, [invoice]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!invoice) return;
 
     setLoading(true);
 
@@ -36,7 +61,7 @@ export function CreateInvoiceDialog({ open, onOpenChange, onSuccess }: CreateInv
     const totalAmount = amount + vatAmount;
 
     try {
-      await databases.createDocument(databaseId, collectionId, ID.unique(), {
+      await databases.updateDocument(databaseId, collectionId, invoice.id, {
         client_name: formData.clientName,
         client_email: formData.clientEmail,
         amount: amount,
@@ -44,40 +69,29 @@ export function CreateInvoiceDialog({ open, onOpenChange, onSuccess }: CreateInv
         vat_amount: vatAmount,
         total_amount: totalAmount,
         due_date: formData.dueDate,
-        status: "unpaid",
-        user_id: user.$id,
-        created_at: new Date().toISOString(),
       });
 
-      toast.success("Invoice created successfully");
-      setFormData({
-        clientName: "",
-        clientEmail: "",
-        amount: "",
-        vatPercentage: "7.5",
-        dueDate: "",
-      });
+      toast.success("Invoice updated successfully");
       onOpenChange(false);
       onSuccess();
     } catch (error) {
-      console.error("Error creating invoice:", error);
-      toast.error("Failed to create invoice");
+      console.error("Error updating invoice:", error);
+      toast.error("Failed to update invoice");
     } finally {
       setLoading(false);
     }
   };
 
   const vatAmount = formData.amount && formData.vatPercentage ? (parseFloat(formData.amount) * parseFloat(formData.vatPercentage)) / 100 : 0;
-
   const totalAmount = formData.amount ? parseFloat(formData.amount) + vatAmount : 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" aria-describedby="create-invoice-description">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" aria-describedby="edit-invoice-description">
         <DialogHeader>
-          <DialogTitle>Create New Invoice</DialogTitle>
-          <p id="create-invoice-description" className="text-sm text-muted-foreground">
-            Fill in the details below to create a new invoice for your client.
+          <DialogTitle>Edit Invoice</DialogTitle>
+          <p id="edit-invoice-description" className="text-sm text-muted-foreground">
+            Update the details below to modify the invoice.
           </p>
         </DialogHeader>
 
@@ -151,7 +165,7 @@ export function CreateInvoiceDialog({ open, onOpenChange, onSuccess }: CreateInv
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating..." : "Create Invoice"}
+            {loading ? "Updating..." : "Update Invoice"}
           </Button>
         </form>
       </DialogContent>

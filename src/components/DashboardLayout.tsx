@@ -43,6 +43,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     const path = location.pathname;
     if (path === "/dashboard") return "Dashboard";
     if (path === "/invoices") return "Invoices";
+    if (path.startsWith("/invoices/")) return "Invoice Details";
     if (path === "/transactions") return "Transactions";
     if (path === "/wallets") return "My Wallets";
     if (path === "/settings") return "Settings";
