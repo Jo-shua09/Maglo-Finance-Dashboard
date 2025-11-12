@@ -3,10 +3,9 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { FileText, DollarSign, Clock, TrendingUp } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import { databases, databaseId, collectionId } from "@/integrations/appwrite/client";
 import { Query } from "appwrite";
+import { FaWallet } from "react-icons/fa6";
 
 interface Invoice {
   id: string;
@@ -84,54 +83,50 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back! Here's an overview of your invoices.</p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="transition-all duration-200 hover:shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalInvoices}</div>
-              <p className="text-xs text-muted-foreground">
-                {paidInvoices.length} paid, {unpaidInvoices.length} pending
-              </p>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="bg-foreground rounded-xl border-0 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                <div className="rounded-full bg-primary/20 p-2">
+                  <FaWallet className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Total Invoices</div>
+                  <div className="text-2xl font-bold text-white">${totalInvoices}</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="transition-all duration-200 hover:shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Paid</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₦{totalPaid.toLocaleString()}</div>
-              <p className="text-xs text-success">Revenue received</p>
+          <Card className="rounded-xl bg-background border-0 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                <div className="rounded-full bg-gray-200 p-2">
+                  <FaWallet className="h-4 w-4 text-foreground" />
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Amount Paid</div>
+                  <div className="text-2xl font-bold">
+                    ${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="transition-all duration-200 hover:shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₦{totalPending.toLocaleString()}</div>
-              <p className="text-xs text-warning">Awaiting payment</p>
-            </CardContent>
-          </Card>
-
-          <Card className="transition-all duration-200 hover:shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total VAT</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₦{totalVAT.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">VAT collected</p>
+          <Card className="rounded-xl bg-background border-0 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                <div className="rounded-full bg-gray-200 p-2">
+                  <FaWallet className="h-4 w-4 text-foreground" />
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Pending Payments</div>
+                  <div className="text-2xl font-bold">
+                    ${totalPending.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
