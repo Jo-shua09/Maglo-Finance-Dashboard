@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -14,15 +14,19 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarFooter,
+  SidebarHeader,
+  SidebarInset,
+  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import { Settings, HelpCircle, LogOut, Search, Bell, PanelRight } from "lucide-react";
+import { Settings, HelpCircle, LogOut, Search, Bell } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import logo from "@/assets/logo.png";
+import icon from "@/assets/icon.png";
 import { RiArrowDownSFill } from "react-icons/ri";
 import { GoHomeFill } from "react-icons/go";
 import { FaArrowTrendUp, FaWallet } from "react-icons/fa6";
 import { TbInvoice } from "react-icons/tb";
-import { BsLayoutSidebarReverse } from "react-icons/bs";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -36,10 +40,23 @@ const navigationItems = [
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
+function SidebarLogo() {
+  const { state } = useSidebar();
+
+  return (
+    <SidebarHeader className="px-3 py-5">
+      {state === "expanded" ? (
+        <img src={logo} alt="Maglo" className="w-28 object-contain" />
+      ) : (
+        <img src={icon} alt="Maglo" className="h-8 w-8 object-contain" />
+      )}
+    </SidebarHeader>
+  );
+}
+
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { signOut, user } = useAuth();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -54,104 +71,81 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        {sidebarOpen && (
-          <Sidebar className="px-1">
-            <div className="px-4 py-6">
-              <img src={logo} alt="Maglo" className="h-8 w-auto" />
-            </div>
+      <div className="flex min-h-screen overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar collapsible="icon">
+          <SidebarLogo />
 
-            <SidebarContent>
-              <SidebarGroup>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {navigationItems.map((item) => (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild>
-                          <NavLink
-                            to={item.url}
-                            className="flex items-center gap-3 px-4 py-5 text-muted-foreground hover:text-foreground transition-colors"
-                            activeClassName="bg-primary text-primary-foreground rounded-lg font-medium"
-                          >
-                            <item.icon className="h-5 w-5" />
-                            <span>{item.title}</span>
-                          </NavLink>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            </SidebarContent>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {navigationItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild tooltip={item.title}>
+                        <NavLink to={item.url} className="flex items-center gap-3  px-4 py-5" activeClassName="bg-primary text-primary-foreground">
+                          <item.icon className="h-5 w-5" />
+                          <span>{item.title}</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
 
-            <SidebarFooter className="p-4 space-y-2">
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground transition-colors w-full">
-                      <HelpCircle className="h-5 w-5" />
-                      <span>Help</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button
-                      onClick={() => signOut()}
-                      className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground transition-colors w-full"
-                    >
-                      <LogOut className="h-5 w-5" />
-                      <span>Logout</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarFooter>
-          </Sidebar>
-        )}
+          <SidebarFooter className="p-4">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Help">
+                  <button className="flex items-center gap-3 w-full text-muted-foreground hover:text-foreground">
+                    <HelpCircle className="h-5 w-5" />
+                    <span>Help</span>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Logout">
+                  <button onClick={() => signOut()} className="flex items-center gap-3 w-full text-muted-foreground hover:text-foreground">
+                    <LogOut className="h-5 w-5" />
+                    <span>Logout</span>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+        </Sidebar>
 
-        <div className="flex-1 flex flex-col">
-          <header className="h-16 bg-card flex items-center justify-between px-6">
+        {/* Main Content */}
+        <SidebarInset>
+          <header className="h-16 bg-card w-full flex items-center justify-between px-4 lg:px-6 border-b flex-shrink-0">
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:bg-transparent transition-all duration-200"
-                aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-                onClick={() => setSidebarOpen((open) => !open)}
-              >
-                {sidebarOpen ? (
-                  <div className="p-2 bg-primary rounded-xl transition-all duration-200">
-                    <PanelRight size={20} className="h-5 w-5" />
-                  </div>
-                ) : (
-                  <div className="p-2 hover:bg-primary transition-all duration-200 rounded-xl">
-                    <PanelRight size={20} className="h-5 w-5" />
-                  </div>
-                )}
-              </Button>
+              <SidebarTrigger className="text-muted-foreground hover:bg-transparent transition-all duration-200" aria-label="Toggle Sidebar" />
               <h1 className="text-xl font-semibold">{getPageTitle()}</h1>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div>
-                <Button variant="ghost" size="icon" className="text-muted-foreground">
-                  <Search className="h-5 w-5" />
+            <div className="flex items-center gap-3 lg:gap-4">
+              <div className="flex items-center gap-1 lg:gap-2">
+                <Button variant="ghost" size="icon" className="text-muted-foreground h-9 w-9 lg:h-10 lg:w-10">
+                  <Search className="h-4 w-4 lg:h-5 lg:w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="text-muted-foreground">
-                  <Bell className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="text-muted-foreground h-9 w-9 lg:h-10 lg:w-10">
+                  <Bell className="h-4 w-4 lg:h-5 lg:w-5" />
                 </Button>
               </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center px-1 bg-gray-100 border rounded-full">
-                    <Avatar className="h-8 w-8">
+                  <Button variant="ghost" className="flex items-center px-1 bg-gray-100 border rounded-full h-9 lg:h-10">
+                    <Avatar className="h-6 w-6 lg:h-8 lg:w-8">
                       <AvatarImage src="" />
-                      <AvatarFallback className="bg-gray-300 text-primary-foreground">{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback className="bg-gray-300 text-primary-foreground text-xs lg:text-sm">
+                        {user?.email?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm lg:block hidden font-medium">{user?.email?.split("@")[0]}</span>
-                    <RiArrowDownSFill className="h-4 w-4" />
+                    <span className="text-sm lg:block hidden font-medium ml-2">{user?.email?.split("@")[0]}</span>
+                    <RiArrowDownSFill className="h-3 w-3 lg:h-4 lg:w-4 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -164,8 +158,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           </header>
 
-          <main className="flex-1 bg-card p-6">{children}</main>
-        </div>
+          <main className="flex-1 bg-card p-4 lg:p-6 overflow-auto">{children}</main>
+        </SidebarInset>
       </div>
     </SidebarProvider>
   );

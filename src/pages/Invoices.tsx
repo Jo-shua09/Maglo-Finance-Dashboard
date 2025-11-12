@@ -157,13 +157,17 @@ export default function Invoices() {
             </div>
           </div>
           <div className="flex space-x-4 items-center">
-            <Button onClick={() => setDialogOpen(true)} className="bg-primary font-semibold text-primary-foreground hover:bg-primary/90">
+            <Button
+              onClick={() => setDialogOpen(true)}
+              aria-label="create invoice"
+              className="bg-primary font-semibold text-primary-foreground hover:bg-primary/90"
+            >
               <FaFileInvoice className="h-4 w-4" />
-              Create Invoice
+              <span className="md:block hidden">Create Invoice</span>
             </Button>
 
             <Select value={filter} onValueChange={(value: "all" | "paid" | "unpaid") => setFilter(value)}>
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="md:w-[120px] w-16">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>

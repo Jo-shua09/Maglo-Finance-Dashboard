@@ -50,7 +50,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-x-hidden">
       <div className="flex w-full flex-col justify-between">
         <div className="mx-auto w-full max-w-md space-y-14 py-8">
           <div>
@@ -61,7 +61,7 @@ export default function Signup() {
             <h1 className="mb-1 text-4xl font-bold">Create new account</h1>
             <p className="mb-8 text-muted-foreground">Welcome! Please enter your details to get started</p>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input

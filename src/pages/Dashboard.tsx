@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 interface Invoice {
   id: string;
@@ -28,6 +29,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchInvoices();
@@ -89,6 +91,14 @@ export default function Dashboard() {
     { name: "Unpaid", value: unpaidInvoices.length },
   ];
 
+  const handleRowClick = (invoiceId: string) => {
+    navigate(`/invoices/${invoiceId}`);
+  };
+
+  const handleViewAll = () => {
+    navigate("/invoices");
+  };
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -102,7 +112,8 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="bg-foreground rounded-xl border-0 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
@@ -164,115 +175,107 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        {/* Chart Section */}
         <Card>
           <CardHeader>
             <CardTitle>Invoice Status</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" fill="hsl(var(--primary))" />
-              </BarChart>
-            </ResponsiveContainer>
+          <CardContent className="md:placeholder-pink-600 p-0">
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="hsl(var(--primary))" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 
+        {/* Recent Invoices Table */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Recent Invoices</CardTitle>
-              <Button variant="outline" onClick={() => (window.location.href = "/invoices")}>
+              <Button variant="outline" onClick={handleViewAll}>
                 View All
               </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow className="!border-b-0 text-xs font-semibold">
-                  <TableHead>Name/Client</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>VAT</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoices
-                  .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                  .slice(0, 5)
-                  .map((invoice) => (
-                    <TableRow
-                      key={invoice.id}
-                      className="cursor-pointer hover:bg-gray-50"
-                      onClick={() => (window.location.href = `/invoices/${invoice.id}`)}
-                    >
-                      <TableCell>
-                        <div className="flex space-x-3 items-center">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src="" />
-                            <AvatarFallback className="bg-gray-300 text-primary-foreground">
-                              {invoice.client_name.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{invoice.client_name}</p>
-                            <p className="text-sm text-muted-foreground">{invoice.client_email}</p>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="!border-b-0 text-xs font-semibold">
+                    <TableHead>Name/Client</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead className="hidden sm:table-cell">VAT</TableHead>
+                    <TableHead>Due Date</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoices
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                    .slice(0, 5)
+                    .map((invoice) => (
+                      <TableRow key={invoice.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleRowClick(invoice.id)}>
+                        <TableCell>
+                          <div className="flex space-x-3 items-center">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src="" />
+                              <AvatarFallback className="bg-gray-300 text-primary-foreground">
+                                {invoice.client_name.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{invoice.client_name}</p>
+                              <p className="text-sm text-muted-foreground">{invoice.client_email}</p>
+                            </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <p>{new Date(invoice.created_at).toLocaleDateString()}</p>
-                      </TableCell>
-                      <TableCell className="font-bold">${Number(invoice.amount).toLocaleString()}</TableCell>
-                      <TableCell>
-                        ${Number(invoice.vat_amount).toLocaleString()} ({invoice.vat_percentage}%)
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <p>{new Date(invoice.due_date).toLocaleDateString()}</p>
-                          <p
-                            className={`text-xs ${
-                              new Date(invoice.due_date) < new Date() && invoice.status === "unpaid"
-                                ? "text-destructive font-medium"
-                                : "text-muted-foreground"
-                            }`}
-                          >
-                            {new Date(invoice.due_date) < new Date() && invoice.status === "unpaid" ? "Overdue" : "Due"}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            invoice.status === "paid"
-                              ? "default"
-                              : invoice.status === "unpaid"
-                              ? "secondary"
-                              : invoice.status === "pending"
-                              ? "pending"
-                              : "pending"
-                          }
-                        >
-                          {invoice.status}
-                        </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <p>{new Date(invoice.created_at).toLocaleDateString()}</p>
+                        </TableCell>
+                        <TableCell className="font-bold">${Number(invoice.amount).toLocaleString()}</TableCell>
+                        <TableCell className="hidden sm:table-cell">
+                          ${Number(invoice.vat_amount).toLocaleString()} ({invoice.vat_percentage}%)
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p>{new Date(invoice.due_date).toLocaleDateString()}</p>
+                            <p
+                              className={`text-xs ${
+                                new Date(invoice.due_date) < new Date() && invoice.status === "unpaid"
+                                  ? "text-destructive font-medium"
+                                  : "text-muted-foreground"
+                              }`}
+                            >
+                              {new Date(invoice.due_date) < new Date() && invoice.status === "unpaid" ? "Overdue" : "Due"}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={invoice.status === "paid" ? "default" : invoice.status === "unpaid" ? "secondary" : "pending"}>
+                            {invoice.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  {invoices.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                        No invoices found
                       </TableCell>
                     </TableRow>
-                  ))}
-                {invoices.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                      No invoices found
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
