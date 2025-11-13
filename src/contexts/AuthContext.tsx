@@ -6,7 +6,7 @@ import { Models } from "appwrite";
 interface AuthContextType {
   user: Models.User<Models.Preferences> | null;
   signIn: (email: string, password: string) => Promise<{ error: Error }>;
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (name: string, email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   loading: boolean;
 }
@@ -46,9 +46,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (name: string, email: string, password: string) => {
     try {
-      await account.create("unique()", email, password);
+      await account.create("unique()", email, password, name);
       // After signup, automatically sign in
       await account.createEmailPasswordSession(email, password);
       const user = await account.get();

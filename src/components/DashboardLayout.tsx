@@ -142,10 +142,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     <Avatar className="h-6 w-6 lg:h-8 lg:w-8">
                       <AvatarImage src="" />
                       <AvatarFallback className="bg-gray-300 text-primary-foreground text-xs lg:text-sm">
-                        {user?.email?.charAt(0).toUpperCase()}
+                        {user?.name?.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm lg:block hidden font-medium ml-2">{user?.email?.split("@")[0]}</span>
+                    <span className="text-sm lg:block hidden font-medium ml-2">{user?.name?.split("@")[0]}</span>
                     <RiArrowDownSFill className="h-3 w-3 lg:h-4 lg:w-4 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>

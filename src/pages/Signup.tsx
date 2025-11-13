@@ -10,6 +10,7 @@ import authImage from "@/assets/auth-image.jpg";
 import vector from "@/assets/vector-small.png";
 
 export default function Signup() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,7 +39,7 @@ export default function Signup() {
 
     setLoading(true);
 
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(name, email, password);
 
     if (error) {
       toast.error(error.message);
@@ -50,7 +51,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex min-h-screen">
       <div className="flex w-full flex-col justify-center">
         <div className="mx-auto w-full max-w-md px-4 py-8">
           <div className="mb-8">
@@ -62,6 +63,19 @@ export default function Signup() {
             <p className="mb-6 sm:mb-8 text-muted-foreground">Welcome! Please enter your details to get started</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="h-12"
+                />
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
