@@ -9,17 +9,6 @@ import { toast } from "sonner";
 import icon from "@/assets/icon.png";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 interface Invoice {
   id: string;
@@ -67,50 +56,6 @@ export default function InvoiceDetails() {
     }
   };
 
-  const handleEdit = () => {
-    if (isEditing) {
-      setIsEditing(false);
-      setEditedInvoice({});
-    } else {
-      setIsEditing(true);
-      setEditedInvoice(invoice);
-    }
-  };
-
-  const handleSave = async () => {
-    try {
-      await databases.updateDocument(databaseId, collectionId, id!, editedInvoice);
-      toast.success("Invoice updated successfully");
-      setIsEditing(false);
-      fetchInvoice();
-    } catch (error) {
-      toast.error("Failed to update invoice");
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      await databases.deleteDocument(databaseId, collectionId, id!);
-      toast.success("Invoice deleted successfully");
-      navigate("/invoices");
-    } catch (error) {
-      toast.error("Failed to delete invoice");
-    }
-  };
-
-  const handleMarkAsPaid = async () => {
-    try {
-      await databases.updateDocument(databaseId, collectionId, id!, {
-        status: "paid",
-      });
-      toast.success("Invoice marked as paid");
-      fetchInvoice();
-    } catch (error) {
-      console.error("Error marking invoice as paid:", error);
-      toast.error("Failed to mark invoice as paid");
-    }
-  };
-
   if (!invoice) {
     return (
       <DashboardLayout>
@@ -129,16 +74,16 @@ export default function InvoiceDetails() {
             New Invoice: <span className="text-primary">MGL{invoice.id ? invoice.id.slice(-6) : ""}</span>
           </h2>
 
-          <Card className="p-6 rounded-2xl shadow-sm border">
-            <div className="flex justify-between items-center bg-foreground text-white p-6 rounded-xl mb-6">
+          <Card className="md:p-6 p-3 rounded-2xl shadow-sm border">
+            <div className="flex justify-between items-center bg-foreground text-white px-3 py-6 md:p-6 rounded-xl mb-6">
               <div className="flex gap-2 items-center">
                 <img src={icon} alt="" />
                 <div>
-                  <h3 className="font-semibold text-lg">Maglo</h3>
+                  <h3 className="font-semibold text-base md:text-lg">Maglo</h3>
                   <p className="text-sm">sales@maglo.com</p>
                 </div>
               </div>
-              <div className="text-right text-sm">
+              <div className="text-right text-xs md:text-sm">
                 <p>1333 Grey Fox Farm Road</p>
                 <p>Houston, TX 77060</p>
                 <p>Bloomfield Hills, Michigan(MI), 48301</p>

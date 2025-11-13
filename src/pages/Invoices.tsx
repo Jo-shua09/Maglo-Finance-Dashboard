@@ -180,7 +180,7 @@ export default function Invoices() {
             </Button>
 
             <Select value={filter} onValueChange={(value: "all" | "paid" | "unpaid") => setFilter(value)}>
-              <SelectTrigger className="md:w-[120px] w-16">
+              <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>
@@ -221,6 +221,7 @@ export default function Invoices() {
             ) : (
               filteredInvoices.map((invoice) => (
                 <TableRow key={invoice.id} className="cursor-pointer hover:bg-gray-50" onClick={() => navigate(`/invoices/${invoice.id}`)}>
+                  {/* Name/Email */}
                   <TableCell>
                     <div className="flex space-x-3 items-center">
                       <Avatar className="h-8 w-8">
@@ -233,13 +234,21 @@ export default function Invoices() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="">
+
+                  {/* created at */}
+                  <TableCell>
                     <p>{new Date(invoice.created_at).toLocaleDateString()}</p>
                   </TableCell>
+
+                  {/* Amount */}
                   <TableCell className="font-bold">${Number(invoice.amount).toLocaleString()}</TableCell>
+
+                  {/* Vat Amount */}
                   <TableCell>
                     ${Number(invoice.vat_amount).toLocaleString()} ({invoice.vat_percentage}%)
                   </TableCell>
+
+                  {/* due date */}
                   <TableCell>
                     <div>
                       <p>{new Date(invoice.due_date).toLocaleDateString()}</p>
@@ -254,6 +263,8 @@ export default function Invoices() {
                       </p>
                     </div>
                   </TableCell>
+
+                  {/* Status */}
                   <TableCell>
                     <Badge
                       variant={
@@ -269,6 +280,8 @@ export default function Invoices() {
                       {invoice.status}
                     </Badge>
                   </TableCell>
+
+                  {/* Actions */}
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
