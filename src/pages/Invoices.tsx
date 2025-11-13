@@ -10,16 +10,15 @@ import { toast } from "sonner";
 import { CreateInvoiceDialog } from "@/components/CreateInvoiceDialog";
 import { EditInvoiceDialog } from "@/components/EditInvoiceDialog";
 import { formatDistanceToNow } from "date-fns";
-import { databases, databaseId, collectionId, ID } from "@/integrations/appwrite/client";
-import { Query, Models } from "appwrite";
+import { databases, databaseId, collectionId } from "@/integrations/appwrite/client";
+import { Query } from "appwrite";
 import { Input } from "@/components/ui/input";
-import { FaFileInvoice, FaFilter } from "react-icons/fa6";
+import { FaFileInvoice } from "react-icons/fa6";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { IoClose, IoFilterSharp } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TbCancel } from "react-icons/tb";
 
 interface Invoice {
   id: string;
