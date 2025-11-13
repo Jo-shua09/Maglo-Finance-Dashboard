@@ -16,9 +16,10 @@ import { Input } from "@/components/ui/input";
 import { FaFileInvoice, FaFilter } from "react-icons/fa6";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { IoFilterSharp } from "react-icons/io5";
+import { IoClose, IoFilterSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TbCancel } from "react-icons/tb";
 
 interface Invoice {
   id: string;
@@ -42,6 +43,7 @@ export default function Invoices() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
     fetchInvoices();
@@ -150,11 +152,22 @@ export default function Invoices() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="md:block hidden">
             <div className="w-full relative">
               <Input type="search" placeholder="Search invoices" className="pl-10 rounded-xl border-0" />
               <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             </div>
+          </div>
+          <div className="block md:hidden">
+            {!showSearch ? (
+              <Button variant="ghost" size="icon" onClick={() => setShowSearch(!showSearch)}>
+                <Search className="h-5 w-5" />
+              </Button>
+            ) : (
+              <Button variant="ghost" size="icon" className="bg-primary" onClick={() => setShowSearch(!showSearch)}>
+                <IoClose className="h-5 w-5" />
+              </Button>
+            )}
           </div>
           <div className="flex space-x-4 items-center">
             <Button
@@ -178,6 +191,13 @@ export default function Invoices() {
             </Select>
           </div>
         </div>
+
+        {showSearch && (
+          <div className="w-full relative">
+            <Input type="search" placeholder="Search invoices" className="pl-10 rounded-xl border-0" />
+            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          </div>
+        )}
 
         <Table>
           <TableHeader className="p-0">

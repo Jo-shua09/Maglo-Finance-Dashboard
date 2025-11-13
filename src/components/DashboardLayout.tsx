@@ -71,9 +71,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar collapsible="icon">
+      {/* Remove the border-red-600 and overflow-hidden, add flex-col */}
+      <div className="flex min-h-screen w-full flex-col md:flex-row">
+        {/* Sidebar - Control width based on state */}
+        <Sidebar collapsible="icon" className="md:fixed md:inset-y-0 md:z-50 md:flex">
           <SidebarLogo />
 
           <SidebarContent>
@@ -83,7 +84,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   {navigationItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild tooltip={item.title}>
-                        <NavLink to={item.url} className="flex items-center gap-3  px-4 py-5" activeClassName="bg-primary text-primary-foreground">
+                        <NavLink to={item.url} className="flex items-center gap-3 px-4 py-5" activeClassName="bg-primary text-primary-foreground">
                           <item.icon className="h-5 w-5" />
                           <span>{item.title}</span>
                         </NavLink>
@@ -117,8 +118,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </SidebarFooter>
         </Sidebar>
 
-        {/* Main Content */}
-        <SidebarInset>
+        {/* Main Content - Dynamic width based on sidebar state */}
+        <SidebarInset className="flex-1 min-w-0">
           <header className="h-16 bg-card w-full flex items-center justify-between px-4 lg:px-6 border-b flex-shrink-0">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="text-muted-foreground hover:bg-transparent transition-all duration-200" aria-label="Toggle Sidebar" />
