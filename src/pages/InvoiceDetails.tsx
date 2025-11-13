@@ -167,7 +167,7 @@ export default function InvoiceDetails() {
           </Card>
         </div>
 
-        {/* Right Sidebar */}
+        {/* Right Side Content */}
         <div className="w-full xl:w-96 space-y-4 md:mt-10">
           <Card className="p-6 rounded-2xl shadow-sm">
             <CardContent className="space-y-3 p-0">
